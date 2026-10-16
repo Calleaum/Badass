@@ -1,0 +1,28 @@
+# routeur-calleaum-1 : Route Reflector (RR), AS 1
+# 1) IP : loopback + liens vers les 3 leaves
+ip addr add 1.1.1.1/32 dev lo
+ip addr add 10.1.1.1/30 dev eth0     # vers routeur-2
+ip addr add 10.1.1.5/30 dev eth1     # vers routeur-3
+ip addr add 10.1.1.9/30 dev eth2     # vers routeur-4
+ip link set eth0 up
+ip link set eth1 up
+ip link set eth2 up
+
+# 2) FRR : OSPF (underlay) + iBGP EVPN avec voisins dynamiques
+vtysh << 'EOF'
+configure terminal
+router ospf
+ network 1.1.1.1/32 area 0
+ network 10.1.1.0/24 area 0
+exit
+router bgp 1
+ neighbor ibgp peer-group
+ neighbor ibgp remote-as 1
+ neighbor ibgp update-source lo
+ bgp listen range 1.1.1.0/29 peer-group ibgp
+ address-family l2vpn evpn
+  neighbor ibgp activate
+  neighbor ibgp route-reflector-client
+ exit-address-family
+end
+EOF

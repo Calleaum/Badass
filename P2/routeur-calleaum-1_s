@@ -1,0 +1,18 @@
+# routeur-calleaum-1 : VXLAN en mode statique
+
+# Underlay : IP de eth0, relie au switch
+ip addr add 10.1.1.1/24 dev eth0
+ip link set eth0 up
+
+# Bridge qui relie le host et le tunnel VXLAN
+ip link add br0 type bridge
+ip link set br0 up
+
+# VXLAN id 10 : local = ce VTEP, remote = l'autre VTEP
+ip link add vxlan10 type vxlan id 10 dstport 4789 local 10.1.1.1 remote 10.1.1.2
+ip link set vxlan10 up
+
+# eth1 (cote host) et vxlan10 dans le bridge
+ip link set eth1 up
+brctl addif br0 eth1
+brctl addif br0 vxlan10

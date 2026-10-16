@@ -1,0 +1,10 @@
+# routeur-calleaum-1 : démons FRR activés (/etc/frr/daemons)
+# Modifié par sed dans le Dockerfile (no -> yes).
+# zebra et staticd sont toujours lancés par watchfrr.
+
+bgpd=yes        # BGP, protocole de routage de l'Internet
+ospfd=yes       # OSPF, routage interne
+isisd=yes       # IS-IS, routage interne
+vtysh_enable=yes  # active le shell vtysh
+
+# Tous les autres démons restent à "no" (valeurs par défaut de l'image).
